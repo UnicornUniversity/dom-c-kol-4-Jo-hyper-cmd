@@ -3,8 +3,16 @@
  * @type {string[]}
  */
 const maleNames = [
-  "Ján", "Andrej", "Peter", "František", "Martin",
-  "Lukáš", "Patrik", "Jozef", "Michal", "Samuel",
+  'Ján',
+  'Andrej',
+  'Peter',
+  'František',
+  'Martin',
+  'Lukáš',
+  'Patrik',
+  'Jozef',
+  'Michal',
+  'Samuel',
 ];
 
 /**
@@ -12,8 +20,16 @@ const maleNames = [
  * @type {string[]}
  */
 const maleSurnames = [
-  "Novák", "Kováč", "Horváth", "Novotný", "Ševčík",
-  "Benko", "Hriň", "Ďurica", "Vavrek", "Kmeť",
+  'Novák',
+  'Kováč',
+  'Horváth',
+  'Novotný',
+  'Ševčík',
+  'Benko',
+  'Hriň',
+  'Ďurica',
+  'Vavrek',
+  'Kmeť',
 ];
 
 /**
@@ -21,8 +37,16 @@ const maleSurnames = [
  * @type {string[]}
  */
 const femaleNames = [
-  "Anna", "Mária", "Jana", "Petra", "Tamara",
-  "Andrea", "Monika", "Katarína", "Nina", "Alena",
+  'Anna',
+  'Mária',
+  'Jana',
+  'Petra',
+  'Tamara',
+  'Andrea',
+  'Monika',
+  'Katarína',
+  'Nina',
+  'Alena',
 ];
 
 /**
@@ -30,8 +54,16 @@ const femaleNames = [
  * @type {string[]}
  */
 const femaleSurnames = [
-  "Holubová", "Zubáčová", "Tóthová", "Repková", "Šoltýsová",
-  "Bartošová", "Špirková", "Gajdošová", "Muráriková", "Kocúriková",
+  'Holubová',
+  'Zubáčová',
+  'Tóthová',
+  'Repková',
+  'Šoltýsová',
+  'Bartošová',
+  'Špirková',
+  'Gajdošová',
+  'Muráriková',
+  'Kocúriková',
 ];
 
 /**
@@ -41,62 +73,69 @@ const femaleSurnames = [
 const workLoad = [10, 20, 30, 40];
 
 /**
- * Supported gender identifiers.
+ * Supported genders.
  * @type {string[]}
  */
-const listOfGenders = ["male", "female"];
+const listOfGenders = ['male', 'female'];
 
 /**
- * Selects random element from a list.
- * @param {Array<*>} list - List to select from.
- * @returns {*} Random element.
+ * Randomly selects an item from a list.
+ * @param {Array<*>} list - List of values.
+ * @returns {*} Randomly selected value.
  */
 function getRandomFromList(list) {
-  return list[Math.floor(Math.random() * list.length)];
+  let randomSelection = Math.floor(Math.random() * list.length);
+  return list[randomSelection];
 }
 
 /**
- * Generates random birthdate based on age range.
- * @param {{min:number, max:number}} ageRange - Minimum and maximum age.
+ * Randomly generates birthdate based on age range.
+ * @param {{min:number, max:number}} ageRange - Age limits.
  * @returns {string} ISO birthdate.
  */
 function getRandomAge(ageRange) {
   const msInYear = 365.25 * 24 * 60 * 60 * 1000;
   const age = ageRange.min + Math.random() * (ageRange.max - ageRange.min);
-  return new Date(Date.now() - age * msInYear).toISOString();
+  let birthdate = new Date(Date.now() - age * msInYear);
+  return birthdate.toISOString();
 }
 
 /**
- * Generates list of employees based on count and age range.
+ * Randomly generates list of employees.
  * @param {number} count - Number of employees to generate.
- * @param {{min:number, max:number}} ageRange - Minimum and maximum age.
- * @returns {Array<object>} Generated employee records.
+ * @param {{min:number, max:number}} ageRange - Min/max age.
+ * @returns {Array<object>} List of employee objects.
  */
 function generateRandomEmployees(count, ageRange) {
-  const listOfEmployees = [];
+  let listOfEmployees = [];
 
   for (let i = 0; i < count; i++) {
-    const gender = getRandomFromList(listOfGenders);
-    const names = gender === "male" ? maleNames : femaleNames;
-    const surnames = gender === "male" ? maleSurnames : femaleSurnames;
+    let employee = {};
 
-    listOfEmployees.push({
-      gender,
-      birthdate: getRandomAge(ageRange),
-      name: getRandomFromList(names),
-      surname: getRandomFromList(surnames),
-      workload: getRandomFromList(workLoad),
-    });
+    employee.gender = getRandomFromList(listOfGenders);
+
+    const names = employee.gender === 'male' ? maleNames : femaleNames;
+    const surnames = employee.gender === 'male' ? maleSurnames : femaleSurnames;
+
+    employee.birthdate = getRandomAge(ageRange);
+    employee.name = getRandomFromList(names);
+    employee.surname = getRandomFromList(surnames);
+    employee.workload = getRandomFromList(workLoad);
+
+    listOfEmployees.push(employee);
   }
 
   return listOfEmployees;
 }
 
 /**
- * Main function for generating employees (used by main.js).
+ * Main export function (formerly main()).
+ * Generates list of employees.
+ *
  * @param {{count:number, age:{min:number, max:number}}} dtoIn - Input parameters.
- * @returns {Array<object>} List of employees.
+ * @returns {Array<object>} Generated list of employees.
  */
 export function exMain(dtoIn) {
-  return generateRandomEmployees(dtoIn.count, dtoIn.age);
+  let dtoOut = generateRandomEmployees(dtoIn.count, dtoIn.age);
+  return dtoOut;
 }
