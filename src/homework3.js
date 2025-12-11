@@ -1,128 +1,102 @@
 /**
- * The main function which calls the application.
- * Please, add specific description here for the application purpose.
- * @param {object} dtoIn contains count of employees, age limit of employees {min, max}
- * @returns {Array} of employees
+ * List of Slovak male first names.
+ * @type {string[]}
  */
-
-//lists of male names & surnames
 const maleNames = [
-  'Ján',
-  'Andrej',
-  'Peter',
-  'František',
-  'Martin',
-  'Lukáš',
-  'Patrik',
-  'Jozef',
-  'Michal',
-  'Samuel',
+  "Ján", "Andrej", "Peter", "František", "Martin",
+  "Lukáš", "Patrik", "Jozef", "Michal", "Samuel",
 ];
-
-const maleSurnames = [
-  'Novák',
-  'Kováč',
-  'Horváth',
-  'Novotný',
-  'Ševčík',
-  'Benko',
-  'Hriň',
-  'Ďurica',
-  'Vavrek',
-  'Kmeť',
-];
-
-// lists of female names & surnames
-const femaleNames = [
-  'Anna',
-  'Mária',
-  'Jana',
-  'Petra',
-  'Tamara',
-  'Andrea',
-  'Monika',
-  'Katarína',
-  'Nina',
-  'Alena',
-];
-const femaleSurnames = [
-  'Holubová',
-  'Zubáčová',
-  'Tóthová',
-  'Repková',
-  'Šoltýsová',
-  'Bartošová',
-  'Špirková',
-  'Gajdošová',
-  'Muráriková',
-  'Kocúriková',
-];
-
-const workLoad = [10, 20, 30, 40];
-const listOfGenders = ['male', 'female'];
 
 /**
- * Randomly selects an item from a list.
- * @param {Array} list  - list of items to select from.
+ * List of Slovak male surnames.
+ * @type {string[]}
  */
+const maleSurnames = [
+  "Novák", "Kováč", "Horváth", "Novotný", "Ševčík",
+  "Benko", "Hriň", "Ďurica", "Vavrek", "Kmeť",
+];
 
+/**
+ * List of Slovak female first names.
+ * @type {string[]}
+ */
+const femaleNames = [
+  "Anna", "Mária", "Jana", "Petra", "Tamara",
+  "Andrea", "Monika", "Katarína", "Nina", "Alena",
+];
+
+/**
+ * List of Slovak female surnames.
+ * @type {string[]}
+ */
+const femaleSurnames = [
+  "Holubová", "Zubáčová", "Tóthová", "Repková", "Šoltýsová",
+  "Bartošová", "Špirková", "Gajdošová", "Muráriková", "Kocúriková",
+];
+
+/**
+ * Supported workloads.
+ * @type {number[]}
+ */
+const workLoad = [10, 20, 30, 40];
+
+/**
+ * Supported gender identifiers.
+ * @type {string[]}
+ */
+const listOfGenders = ["male", "female"];
+
+/**
+ * Selects random element from a list.
+ * @param {Array<*>} list - List to select from.
+ * @returns {*} Random element.
+ */
 function getRandomFromList(list) {
-  let randomSelection = Math.floor(Math.random() * list.length);
-  let randomResult = list[randomSelection];
-  return randomResult;
+  return list[Math.floor(Math.random() * list.length)];
 }
 
 /**
- * Randomly generates a birthdate based on age range.
- * @param {object} ageRange  - age range object with min and max properties.
+ * Generates random birthdate based on age range.
+ * @param {{min:number, max:number}} ageRange - Minimum and maximum age.
+ * @returns {string} ISO birthdate.
  */
-
 function getRandomAge(ageRange) {
   const msInYear = 365.25 * 24 * 60 * 60 * 1000;
-
-  let age = ageRange.min + Math.random() * (ageRange.max - ageRange.min);
-
-  let ageMs = age * msInYear;
-
-  let birthdate = new Date(Date.now() - ageMs);
-
-  return birthdate.toISOString();
+  const age = ageRange.min + Math.random() * (ageRange.max - ageRange.min);
+  return new Date(Date.now() - age * msInYear).toISOString();
 }
 
-
 /**
- * Randomly generates a list of employees.
- * @param {number} count  - number of employees to generate.
- * @param {object} ageRange  - age range object with min and max properties.
+ * Generates list of employees based on count and age range.
+ * @param {number} count - Number of employees to generate.
+ * @param {{min:number, max:number}} ageRange - Minimum and maximum age.
+ * @returns {Array<object>} Generated employee records.
  */
-
 function generateRandomEmployees(count, ageRange) {
-  let listOfEmployees = [];
+  const listOfEmployees = [];
 
   for (let i = 0; i < count; i++) {
-    let employee = {};
+    const gender = getRandomFromList(listOfGenders);
+    const names = gender === "male" ? maleNames : femaleNames;
+    const surnames = gender === "male" ? maleSurnames : femaleSurnames;
 
-    employee.gender = getRandomFromList(listOfGenders);
-
-    const names = employee.gender === 'male' ? maleNames : femaleNames;
-    const surnames = employee.gender === 'male' ? maleSurnames : femaleSurnames;
-
-    employee.birthdate = getRandomAge(ageRange);
-    employee.name = getRandomFromList(names);
-    employee.surname = getRandomFromList(surnames);
-    employee.workload = getRandomFromList(workLoad);
-    listOfEmployees.push(employee);
+    listOfEmployees.push({
+      gender,
+      birthdate: getRandomAge(ageRange),
+      name: getRandomFromList(names),
+      surname: getRandomFromList(surnames),
+      workload: getRandomFromList(workLoad),
+    });
   }
+
   return listOfEmployees;
 }
 
 /**
- * Main function which calls the application.
- * @param {object} dtoIn  - input data object with count and age properties.
- * @returns {Array}  - list of generated employees.
+ * Main function for generating employees (used by main.js).
+ * @param {{count:number, age:{min:number, max:number}}} dtoIn - Input parameters.
+ * @returns {Array<object>} List of employees.
  */
-
 export function exMain(dtoIn) {
-  let dtoOut = generateRandomEmployees(dtoIn.count, dtoIn.age);
-  return dtoOut;
+  return generateRandomEmployees(dtoIn.count, dtoIn.age);
 }
