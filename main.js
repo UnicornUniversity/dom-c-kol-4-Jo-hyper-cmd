@@ -1,11 +1,13 @@
-import { exMain } from './src/homework3.js';
+import { exMain } from "./src/homework3.js";
 
 /**
  * Main application function.
- * Generates statistics for employees.
+ * Generates statistics for employees created using generateEmployeeData().
  *
- * @param {object} dtoIn - Input with count and age range.
- * @returns {object} Employee statistics.
+ * @param {object} dtoIn - Input definition for task: number of employees and an age range.
+ * @param {number} dtoIn.count - Number of employees to generate.
+ * @param {{min:number, max:number}} dtoIn.age - Allowed age range.
+ * @returns {object} Statistics of generated employees.
  */
 export function main(dtoIn) {
   const employees = generateEmployeeData(dtoIn);
@@ -15,20 +17,21 @@ export function main(dtoIn) {
 /**
  * Generates employee data using external generator from task 3.
  *
- * @param {object} dtoIn
- * @returns {Array<object>}
+ * @param {object} dtoIn - Input object containing count and age range.
+ * @returns {Array<object>} Array of generated employee objects.
  */
 export function generateEmployeeData(dtoIn) {
   return exMain(dtoIn);
 }
 
 /**
- * Extracts values of the given key from list.
+ * Extracts values of the given key from a list of objects.
+ * If value is provided, returns only items where object[key] === value.
  *
- * @param {Array<object>} list
- * @param {string} key
- * @param {*} [value]
- * @returns {Array<*>}
+ * @param {Array<object>} list - List of objects to process.
+ * @param {string} key - Name of the property to extract.
+ * @param {*} [value] - Optional filter value.
+ * @returns {Array<*>} Array of extracted values.
  */
 function filterList(list, key, value) {
   if (value === undefined) {
@@ -38,82 +41,83 @@ function filterList(list, key, value) {
 }
 
 /**
- * Computes decimal ages using SAME formula as generator:
- * (now - birthdate) / (365.25 * 24 * 60 * 60 * 1000)
+ * Computes sorted raw ages (decimal) of employees from their birthdates.
  *
- * This makes age calculation 100% consistent with exMain()
- *
- * @param {Array<object>} list
- * @returns {number[]}
+ * @param {Array<object>} list - List of employee objects.
+ * @returns {number[]} Sorted array of raw (decimal) ages.
  */
 function getSortedAges(list) {
-  const MS_IN_YEAR = 365.25 * 24 * 60 * 60 * 1000;
+  const msInYear = 365.25 * 24 * 60 * 60 * 1000;
 
   return list
-    .map(e => {
-      const birth = new Date(e.birthdate);
-      return (Date.now() - birth) / MS_IN_YEAR;
-    })
+    .map(e => (Date.now() - new Date(e.birthdate)) / msInYear)
     .sort((a, b) => a - b);
 }
 
 /**
- * Computes average of list.
+ * Computes the average of a numeric list.
  *
- * @param {number[]} list
- * @returns {number}
+ * @param {number[]} list - Array of numbers.
+ * @returns {number} Average value.
  */
 function getAverage(list) {
   let sum = 0;
-  for (let i = 0; i < list.length; i++) sum += list[i];
+  for (let i = 0; i < list.length; i++) {
+    sum += list[i];
+  }
   return sum / list.length;
 }
 
 /**
- * Computes median of list.
+ * Computes median of a numeric list.
  *
- * @param {number[]} list
- * @returns {number}
+ * @param {number[]} list - List of numeric values.
+ * @returns {number} Median value.
  */
 function findMedian(list) {
-  const sorted = [...list].sort((a, b) => a - b);
-  const mid = Math.floor(sorted.length / 2);
+  list = [...list].sort((a, b) => a - b);
+  const mid = Math.floor(list.length / 2);
 
-  if (sorted.length % 2 === 0) {
-    return (sorted[mid - 1] + sorted[mid]) / 2;
-  } else {
-    return sorted[mid];
+  if (list.length % 2 === 0) {
+    return (list[mid - 1] + list[mid]) / 2;
   }
+  return list[mid];
 }
 
 /**
- * Computes all required statistics for task 4.
+ * Computes complete statistics required in task 4:
+ * - total employee count
+ * - counts for each workload
+ * - min / max / average / median age
+ * - median workload
+ * - average workload of women
+ * - employees sorted by workload
  *
- * @param {Array<object>} employees
- * @returns {object}
+ * @param {Array<object>} employees - Array of employee objects.
+ * @returns {object} Statistics object.
  */
 export function getEmployeeStatistics(employees) {
   const ages = getSortedAges(employees);
 
-  let dtoOut = {};
+  const dtoOut = {};
 
-  // workload counts
+  // Workload counts
   dtoOut.total = employees.length;
   dtoOut.workload10 = filterList(employees, "workload", 10).length;
   dtoOut.workload20 = filterList(employees, "workload", 20).length;
   dtoOut.workload30 = filterList(employees, "workload", 30).length;
   dtoOut.workload40 = filterList(employees, "workload", 40).length;
 
-  // age statistics — EXACT match with GitHub Classroom expectation
+  // Age statistics — tests require integer values except averageAge
   dtoOut.averageAge = Math.round(getAverage(ages) * 10) / 10;
-  dtoOut.minAge = Math.min(...ages);
-  dtoOut.maxAge = Math.max(...ages);
-  dtoOut.medianAge = findMedian(ages);
+  dtoOut.minAge = Math.floor(Math.min(...ages));
+  dtoOut.maxAge = Math.floor(Math.max(...ages));
+  dtoOut.medianAge = Math.floor(findMedian(ages));
 
-  // workload median
+  // Median workload
   dtoOut.medianWorkload = findMedian(filterList(employees, "workload"));
 
-  // average workload of women
+  // Average workload of women
   const womenWorkload = employees
     .filter(e => e.gender === "female")
     .map(e => e.workload);
@@ -123,7 +127,7 @@ export function getEmployeeStatistics(employees) {
       ? Math.round(getAverage(womenWorkload) * 10) / 10
       : 0;
 
-  // sorted employees
+  // Sorted employee list
   dtoOut.sortedByWorkload = [...employees].sort(
     (a, b) => a.workload - b.workload
   );
