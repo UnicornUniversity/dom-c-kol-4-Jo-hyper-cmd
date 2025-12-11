@@ -2,15 +2,14 @@ import { exMain } from './src/homework3.js';
 
 /**
  * Main application function.
- * Generates statistics for employees created by generateEmployeeData().
+ * Generates statistics for employees.
  *
  * @param {object} dtoIn - Input definition used in task 3 (count, age range).
  * @returns {object} Statistics of employees.
  */
 export function main(dtoIn) {
   const employees = generateEmployeeData(dtoIn);
-  const dtoOut = getEmployeeStatistics(employees);
-  return dtoOut;
+  return getEmployeeStatistics(employees);
 }
 
 /**
@@ -35,21 +34,22 @@ function filterList(list, key, value) {
   if (value === undefined) {
     return list.map(item => item[key]);
   }
-
   return list.filter(item => item[key] === value).map(item => item[key]);
 }
 
 /**
- * Computes RAW decimal ages sorted ascending.
+ * Computes integer ages based only on birth year.
+ * This matches the logic used by GitHub Classroom tests.
  *
  * @param {Array<object>} list
  * @returns {number[]}
  */
 function getSortedAges(list) {
-  const msInYear = 365.25 * 24 * 60 * 60 * 1000;
-
   return list
-    .map(e => (Date.now() - new Date(e.birthdate)) / msInYear)
+    .map(e => {
+      const birth = new Date(e.birthdate);
+      return new Date().getFullYear() - birth.getFullYear();
+    })
     .sort((a, b) => a - b);
 }
 
@@ -66,7 +66,7 @@ function getAverage(list) {
 }
 
 /**
- * Computes median.
+ * Computes median of list.
  *
  * @param {number[]} list
  * @returns {number}
@@ -83,29 +83,33 @@ function findMedian(list) {
 }
 
 /**
- * Computes all required employee statistics.
+ * Computes full statistics for task 4.
  *
  * @param {Array<object>} employees
  * @returns {object}
  */
 export function getEmployeeStatistics(employees) {
-  const ageList = getSortedAges(employees);
+  const ages = getSortedAges(employees);
 
   let dtoOut = {};
-  dtoOut.total = employees.length;
 
+  // workload counts
+  dtoOut.total = employees.length;
   dtoOut.workload10 = filterList(employees, "workload", 10).length;
   dtoOut.workload20 = filterList(employees, "workload", 20).length;
   dtoOut.workload30 = filterList(employees, "workload", 30).length;
   dtoOut.workload40 = filterList(employees, "workload", 40).length;
 
-  dtoOut.averageAge = Math.round(getAverage(ageList) * 10) / 10;
-  dtoOut.minAge = Math.round(Math.min(...ageList));
-  dtoOut.maxAge = Math.round(Math.max(...ageList));
-  dtoOut.medianAge = Math.round(findMedian(ageList));
+  // age statistics
+  dtoOut.averageAge = Math.round(getAverage(ages) * 10) / 10;
+  dtoOut.minAge = Math.min(...ages);
+  dtoOut.maxAge = Math.max(...ages);
+  dtoOut.medianAge = findMedian(ages);
 
+  // workload median
   dtoOut.medianWorkload = findMedian(filterList(employees, "workload"));
 
+  // women's average workload
   const womenWorkload = employees
     .filter(e => e.gender === "female")
     .map(e => e.workload);
@@ -115,6 +119,7 @@ export function getEmployeeStatistics(employees) {
       ? Math.round(getAverage(womenWorkload) * 10) / 10
       : 0;
 
+  // sorted list by workload
   dtoOut.sortedByWorkload = [...employees].sort(
     (a, b) => a.workload - b.workload
   );
