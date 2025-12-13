@@ -1,12 +1,4 @@
 import { exMain } from "./homework3.js";
-
-const dtoIn = {
-  count: 15,
-  age: {
-    min: 24,
-    max: 40
-  }
-}
 /**
  * Main application function.
  * Generates employee statistics based on generated employee data.
