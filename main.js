@@ -1,5 +1,12 @@
-import { exMain } from "./src/homework3.js";
+import { exMain } from "./homework3.js";
 
+const dtoIn = {
+  count: 15,
+  age: {
+    min: 24,
+    max: 40
+  }
+}
 /**
  * Main application function.
  * Generates employee statistics based on generated employee data.
@@ -109,9 +116,7 @@ export function getEmployeeStatistics(employees) {
   dtoOut.medianWorkload = findMedian(filterList(employees, "workload"));
 
   // Average workload of women
-  const womenWorkload = employees
-    .filter(e => e.gender === "female")
-    .map(e => e.workload);
+  const womenWorkload = filterList(employees, "workload", "female");
 
   dtoOut.averageWomenWorkload =
     womenWorkload.length > 0
