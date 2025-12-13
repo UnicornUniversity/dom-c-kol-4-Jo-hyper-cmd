@@ -116,7 +116,9 @@ export function getEmployeeStatistics(employees) {
   dtoOut.medianWorkload = findMedian(filterList(employees, "workload"));
 
   // Average workload of women
-  const womenWorkload = filterList(employees, "workload", "female");
+  const womenWorkload = employees
+    .filter(e => e.gender === "female")
+    .map(e => e.workload);
 
   dtoOut.averageWomenWorkload =
     womenWorkload.length > 0
